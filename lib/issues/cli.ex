@@ -8,7 +8,9 @@ defmodule Issues.CLI do
   """
 
   def run(argv) do
-    parse_args(argv)
+    argv
+    |> parse_args
+    |> process
   end
 
   @doc """
@@ -32,5 +34,21 @@ defmodule Issues.CLI do
   end
   def args_to_internal_representation(_) do
     :help
+  end
+
+  def process(:help) do
+    IO.puts """
+    usage: issues <user> <project> [ count | #{@default_count} ]
+    """
+  end
+  def process({user, project, _count}) do
+    Issues.GithubIssues.fetch(user, project)
+    |> decord_response()
+  end
+
+  def decord_response({:ok, body}), do: body
+  def decord_response({:error, error}) do
+    IO.puts "Error fetching from Github: #{error["message"]}"
+    System.halt(2)
   end
 end
