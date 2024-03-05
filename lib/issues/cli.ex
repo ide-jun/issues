@@ -44,6 +44,19 @@ defmodule Issues.CLI do
   def process({user, project, _count}) do
     Issues.GithubIssues.fetch(user, project)
     |> decord_response()
+    |> sort_into_desending_order()
+    |> last(count)
+  end
+
+  def last(list, count) do
+    list
+    |> Enum.take(count)
+    |> Enum.reverse
+  end
+
+  def sort_into_desending_order(list_of_issues) do
+    list_of_issues
+    |> Enum.sort(fn i1, i2 -> i1["created_at"] >= i2["created_at"] end)
   end
 
   def decord_response({:ok, body}), do: body
