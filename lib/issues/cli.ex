@@ -21,27 +21,32 @@ defmodule Issues.CLI do
   Return a tuple of `{ user, project, count }` , or: `help` if help was given.
   """
   def parse_args(argv) do
-    OptionParser.parse(argv,  switches: [help: :boolean],
-                                      aliases: [h: :help])
+    OptionParser.parse(argv,
+      switches: [help: :boolean],
+      aliases: [h: :help]
+    )
     |> elem(1)
     |> args_to_internal_representation()
   end
 
   def args_to_internal_representation([user, project, count]) do
-    { user, project, String.to_integer(count) }
+    {user, project, String.to_integer(count)}
   end
+
   def args_to_internal_representation([user, project]) do
-    { user, project, @default_count }
+    {user, project, @default_count}
   end
+
   def args_to_internal_representation(_) do
     :help
   end
 
   def process(:help) do
-    IO.puts """
+    IO.puts("""
     usage: issues <user> <project> [ count | #{@default_count} ]
-    """
+    """)
   end
+
   def process({user, project, count}) do
     Issues.GithubIssues.fetch(user, project)
     |> decord_response()
@@ -53,7 +58,7 @@ defmodule Issues.CLI do
   def last(list, count) do
     list
     |> Enum.take(count)
-    |> Enum.reverse
+    |> Enum.reverse()
   end
 
   def sort_into_desending_order(list_of_issues) do
@@ -62,8 +67,9 @@ defmodule Issues.CLI do
   end
 
   def decord_response({:ok, body}), do: body
+
   def decord_response({:error, error}) do
-    IO.puts "Error fetching from Github: #{error["message"]}"
+    IO.puts("Error fetching from Github: #{error["message"]}")
     System.halt(2)
   end
 end
